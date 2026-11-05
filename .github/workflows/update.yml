@@ -24,7 +24,7 @@ jobs:
           # 2. Strip comments/empty lines, clean whitespace, and add '||' prefix
           # Note: Standard AdGuard syntax is '||domain.com^'. If you want the ending '^', change the sed command to:
           sed -E '/^[[:blank:]]*(#|$)/d; s/^[[:blank:]]*//; s/[[:blank:]]*$//; s/^/||/; s/$/^/' raw_list.txt > youtubelist_agh.txt
-          sed -E '/^[[:blank:]]*(#|$)/d; s/^[[:blank:]]*//; s/[[:blank:]]*$//; s/^/||/' raw_list.txt > youtubelist_agh.txt
+          # sed -E '/^[[:blank:]]*(#|$)/d; s/^[[:blank:]]*//; s/[[:blank:]]*$//; s/^/||/' raw_list.txt > youtubelist_agh.txt
 
           rm raw_list.txt
 
