@@ -1,0 +1,41 @@
+name: Sync & Format AGH YouTube List
+
+on:
+  schedule:
+    # Runs automatically once every 12 hours (UTC)
+    - cron: '0 */12 * * *'
+  workflow_dispatch: # Allows you to manually trigger the sync anytime
+
+jobs:
+  update-list:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download and format list
+        run: |
+          # 1. Fetch the upstream list
+          curl -sSL "https://raw.githubusercontent.com/kboghdady/youTube_ads_4_pi-hole/refs/heads/master/youtubelist.txt" -o raw_list.txt
+
+          # 2. Strip comments/empty lines, clean whitespace, and add '||' prefix
+          # Note: Standard AdGuard syntax is '||domain.com^'. If you want the ending '^', change the sed command to:
+          # sed -E '/^[[:blank:]]*(#|$)/d; s/^[[:blank:]]*//; s/[[:blank:]]*$//; s/^/||/; s/$/^/' raw_list.txt > youtubelist_agh.txt
+          sed -E '/^[[:blank:]]*(#|$)/d; s/^[[:blank:]]*//; s/[[:blank:]]*$//; s/^/||/' raw_list.txt > youtubelist_agh.txt
+
+          rm raw_list.txt
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add youtubelist_agh.txt
+          if git diff --staged --quiet; then
+            echo "No changes found. Skipping commit."
+          else
+            git commit -m "Auto-update: Sync with upstream YouTube blocklist"
+            git push
+          fi
